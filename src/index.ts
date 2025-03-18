@@ -1,72 +1,75 @@
-// import { serve } from "@hono/node-server";
-// import { Hono } from "Hono";
-
-// const app = new Hono();
-
-// const reminders: string[] = [];
-// app.get("/health", (context) => {
-//   const req = context.req;
-//   return context.json({ message: "Hello World" }, 200);
-// });
-
-// app.get("/reminders", (context) => {
-//   return context.json(reminders, 200);
-// });
-
-// app.post("/reminders", async (context) => {
-//   const body = await context.req.json();
-
-//   const reminder = body.reminder;
-
-//   reminders.push(reminder);
-
-//   return context.json(reminder, 201);
-// });
-
-// serve(app);
-
-// console.log("server is running on http://localhost:3000");
-
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get("/generate", (c) => {
-  const val: string = Math.random().toString();
-  return c.json({ value: val }, 200);
+serve(app);
+
+app.get("/generate", (context) => {
+  return context.json(
+    {
+      randomNumber: Math.random(),
+    },
+    200
+  );
 });
 
-app.get("current-date", (c) => {
+app.get("/current-time", (context) => {
   const date = new Date();
-  return c.json({ date: date.toISOString() }, 200);
+
+  return context.json(
+    {
+      currentTime: date.toLocaleString(),
+    },
+    200
+  );
 });
 
-app.get("/environment", (c) => {
-  const ver = process.version;
-  const platform = process.platform;
-  return c.json({ version: ver, platform: platform }, 200);
+app.get("/environment", (context) => {
+  const currentNodeVersion = process.version;
+  const currentPlatform = process.platform;
+
+  return context.json(
+    {
+      version: currentNodeVersion,
+      platform: currentPlatform,
+    },
+    200
+  );
 });
 
-app.get("/echo", (c) => {
-  const queryParams = c.req.query(); // Get all query parameters
-  return c.json({ received: queryParams });
+app.get("/puppet", (context) => {
+  const queryParameters = context.req.query();
+
+  return context.json(
+    {
+      queryParameters,
+    },
+    200
+  );
 });
 
-const numbers: number[] = []; // Define an array to store data
+const numbers: number[] = [];
 
-app.post("/store-number", async (c) => {
-  const body = await c.req.json();
+app.post("/numbers", async (context) => {
+  const body = await context.req.json();
   const number = body.number;
 
   numbers.push(number);
 
-  return c.json({ number: number }, 201);
+  return context.json(
+    {
+      storedNumber: number,
+    },
+    200
+  );
 });
-serve(app);
 
-app.get("/numbers", (c) => {
-  return c.json(numbers, 200);
+app.get("/numbers", (context) => {
+  return context.json(
+    {
+      numbers,
+    },
+    200
+  );
 });
-
-console.log("server is running on http://localhost:3000");
